@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Diagnostic Tool</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="container">
+        <h1>Website Diagnostic Tool</h1>
+
+        <div class="section status-section">
+            <label>Internet Connectivity:</label>
+            <span id="internet-status" class="status-indicator red" title="Checking internet..."></span>
+        </div>
+
+        <div class="section input-section">
+            <label for="website-url">Enter website URL (e.g., example.com):</label>
+            <input type="text" id="website-url" placeholder="example.com">
+        </div>
+
+        <div class="section dns-section">
+            <h2>DNS Servers for nslookup:</h2>
+            <p class="description">Select and edit the DNS servers to use for nslookup. Deselect to exclude.</p>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns1-checkbox" checked>
+                <input type="text" id="dns1-ip" value="8.8.8.8">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns2-checkbox" checked>
+                <input type="text" id="dns2-ip" value="8.8.4.4">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns3-checkbox" checked>
+                <input type="text" id="dns3-ip" value="1.1.1.1">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns4-checkbox" checked>
+                <input type="text" id="dns4-ip" value="9.9.9.9">
+            </div>
+        </div>
+
+        <div class="section button-section">
+            <button id="run-diagnostic" class="action-button primary">Run Diagnostic</button>
+            <button id="stop-diagnostic" class="action-button secondary" disabled>Stop Diagnostic</button>
+        </div>
+
+        <div class="section output-section">
+            <h2>Diagnostic Output:</h2>
+            <pre id="diagnostic-output"></pre>
+            <button id="copy-diagnostic-output" class="action-button small" disabled>Copy Output</button>
+        </div>
+
+        <div class="section internal-browser-section" style="display: none;"> <!-- Keep initially hidden -->
+            <h2>Internal Browser & Screenshots:</h2>
+            <p class="description">Open the URL within the tool to capture screenshots of its content.</p>
+            <button id="open-url-in-tool-btn" class="action-button primary small">Open URL in Tool</button>
+            <div class="browser-status">
+                URL: <span id="internal-browser-url-display">N/A</span> | Status: <span id="internal-browser-status">Idle</span>
+            </div>
+            <webview id="internal-browser-webview" src="about:blank"
+                     style="width:100%; height:400px; border:1px solid #ccc; border-radius: 8px; margin-top: 15px;"
+                     webpreferences="contextIsolation=yes,sandbox=yes,nodeIntegration=no,preload=./preload-webview.js"
+                     partition="persist:webviewsession">
+            </webview>
+            <p class="note">Note: Screenshots will capture the content of this internal browser window.</p>
+        </div>
+
+        <div class="section single-command-section">
+            <h2>Manual Command Execution:</h2>
+            <p class="description">Run single network commands.</p>
+            <div class="command-input-group">
+                <input type="text" id="single-command-input" placeholder="Enter IP or hostname (e.g., google.com)">
+                <select id="command-type-select">
+                    <option value="">Select Command</option>
+                    <option value="ping">Ping</option>
+                    <option value="tracert">Tracert</option>
+                    <option value="nslookup">Nslookup</option>
+                </select>
+                <button id="run-single-command" class="action-button primary">Run Command</button>
+            </div>
+            <pre id="single-command-output"></pre>
+            <button id="copy-single-command-output" class="action-button small" disabled>Copy Output</button>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
+
+
+
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Diagnostic Tool</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="container">
+        <h1>Website Diagnostic Tool</h1>
+
+        <div class="section status-section">
+            <label>Internet Connectivity:</label>
+            <span id="internet-status" class="status-indicator red" title="Checking internet..."></span>
+        </div>
+
+        <div class="section input-section">
+            <label for="website-url">Enter website URL (e.g., example.com):</label>
+            <input type="text" id="website-url" placeholder="example.com">
+        </div>
+
+        <div class="section dns-section">
+            <h2>DNS Servers for nslookup:</h2>
+            <p class="description">Select and edit the DNS servers to use for nslookup. Deselect to exclude.</p>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns1-checkbox" checked>
+                <input type="text" id="dns1-ip" value="8.8.8.8">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns2-checkbox" checked>
+                <input type="text" id="dns2-ip" value="8.8.4.4">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns3-checkbox" checked>
+                <input type="text" id="dns3-ip" value="1.1.1.1">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns4-checkbox" checked>
+                <input type="text" id="dns4-ip" value="9.9.9.9">
+            </div>
+        </div>
+
+        <div class="section button-section">
+            <button id="run-diagnostic" class="action-button primary">Run Diagnostic</button>
+            <button id="stop-diagnostic" class="action-button secondary" disabled>Stop Diagnostic</button>
+        </div>
+
+        <div class="section output-section">
+            <h2>Diagnostic Output:</h2>
+            <pre id="diagnostic-output"></pre>
+            <button id="copy-diagnostic-output" class="action-button small" disabled>Copy Output</button>
+        </div>
+
+
+        <div class="section internal-browser-section" style="display: none;"> 
+            <h2>Internal Browser & Screenshots:</h2>
+            <p class="description">Open the URL within the tool to capture screenshots of its content.</p>
+            <button id="open-url-in-tool-btn" class="action-button primary small">Open URL in Tool</button>
+            <div class="browser-status">
+                URL: <span id="internal-browser-url-display">N/A</span> | Status: <span id="internal-browser-status">Idle</span>
+            </div>
+
+            <webview id="internal-browser-webview" src="about:blank"
+                     style="width:100%; height:400px; border:1px solid #ccc; border-radius: 8px; margin-top: 15px;"
+                     webpreferences="contextIsolation=yes,sandbox=yes,nodeIntegration=no,preload=./preload-webview.js"
+                     partition="persist:webviewsession">
+            </webview>
+            <p class="note">Note: Screenshots will capture the content of this internal browser window.</p>
+        </div>
+
+        <div class="section single-command-section">
+            <h2>Manual Command Execution:</h2>
+            <p class="description">Run single network commands.</p>
+            <div class="command-input-group">
+                <input type="text" id="single-command-input" placeholder="Enter IP or hostname (e.g., google.com)">
+                <select id="command-type-select">
+                    <option value="">Select Command</option>
+                    <option value="ping">Ping</option>
+                    <option value="tracert">Tracert</option>
+                    <option value="nslookup">Nslookup</option>
+                </select>
+                <button id="run-single-command" class="action-button primary">Run Command</button>
+            </div>
+            <pre id="single-command-output"></pre>
+            <button id="copy-single-command-output" class="action-button small" disabled>Copy Output</button>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
+-->
+
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Diagnostic Tool</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="container">
+        <h1>Website Diagnostic Tool</h1>
+
+        <div class="section status-section">
+            <label>Internet Connectivity:</label>
+            <span id="internet-status" class="status-indicator red" title="Checking internet..."></span>
+        </div>
+
+        <div class="section input-section">
+            <label for="website-url">Enter website URL (e.g., example.com):</label>
+            <input type="text" id="website-url" placeholder="example.com">
+        </div>
+
+        <div class="section dns-section">
+            <h2>DNS Servers for nslookup:</h2>
+            <p class="description">Select and edit the DNS servers to use for nslookup. Deselect to exclude.</p>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns1-checkbox" checked>
+                <input type="text" id="dns1-ip" value="8.8.8.8">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns2-checkbox" checked>
+                <input type="text" id="dns2-ip" value="8.8.4.4">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns3-checkbox" checked>
+                <input type="text" id="dns3-ip" value="1.1.1.1">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns4-checkbox" checked>
+                <input type="text" id="dns4-ip" value="9.9.9.9">
+            </div>
+        </div>
+
+        <div class="section button-section">
+            <button id="run-diagnostic" class="action-button primary">Run Diagnostic</button>
+            <button id="stop-diagnostic" class="action-button secondary" disabled>Stop Diagnostic</button>
+        </div>
+
+        <div class="section output-section">
+            <h2>Diagnostic Output:</h2>
+            <pre id="diagnostic-output"></pre>
+            <button id="copy-diagnostic-output" class="action-button small" disabled>Copy Output</button>
+        </div>
+
+        <div class="section single-command-section">
+            <h2>Manual Command Execution:</h2>
+            <p class="description">Run single network commands.</p>
+            <div class="command-input-group">
+                <input type="text" id="single-command-input" placeholder="Enter IP or hostname (e.g., google.com)">
+                <select id="command-type-select">
+                    <option value="">Select Command</option>
+                    <option value="ping">Ping</option>
+                    <option value="tracert">Tracert</option>
+                    <option value="nslookup">Nslookup</option>
+                </select>
+                <button id="run-single-command" class="action-button primary">Run Command</button>
+            </div>
+            <pre id="single-command-output"></pre>
+            <button id="copy-single-command-output" class="action-button small" disabled>Copy Output</button>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
+-->
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Diagnostic Tool</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="container">
+        <h1>Website Diagnostic Tool</h1>
+
+        <div class="section status-section">
+            <label>Internet Connectivity:</label>
+            <span id="internet-status" class="status-indicator red" title="Checking internet..."></span>
+        </div>
+
+        <div class="section input-section">
+            <label for="website-url">Enter website URL (e.g., example.com):</label>
+            <input type="text" id="website-url" placeholder="example.com">
+        </div>
+
+        <div class="section dns-section">
+            <h2>DNS Servers for nslookup:</h2>
+            <p class="description">Select and edit the DNS servers to use for nslookup. Deselect to exclude.</p>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns1-checkbox" checked>
+                <input type="text" id="dns1-ip" value="8.8.8.8">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns2-checkbox" checked>
+                <input type="text" id="dns2-ip" value="8.8.4.4">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns3-checkbox" checked>
+                <input type="text" id="dns3-ip" value="1.1.1.1">
+            </div>
+            <div class="dns-ip-group">
+                <input type="checkbox" id="dns4-checkbox" checked>
+                <input type="text" id="dns4-ip" value="9.9.9.9">
+            </div>
+        </div>
+
+        <div class="section button-section">
+            <button id="run-diagnostic" class="action-button primary">Run Diagnostic</button>
+            <button id="stop-diagnostic" class="action-button secondary" disabled>Stop Diagnostic</button>
+        </div>
+
+        <div class="section output-section">
+            <h2>Diagnostic Output:</h2>
+            <pre id="diagnostic-output"></pre>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
+-->
+
